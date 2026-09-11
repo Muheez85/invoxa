@@ -1,5 +1,5 @@
 import RecentInvoices from "../components/dashboard/RecentInvoices";
-import Statscard from "../components/dashboard/statscard";
+import Statscard from "../components/dashboard/Statscard";
 import StatsInfo from "../components/dashboard/StatsInfo";
 
 

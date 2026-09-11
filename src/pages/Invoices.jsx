@@ -151,7 +151,7 @@ const filteredInvoices = invoices.filter((invoice) => {
         /* Invoice Table */
         <div className="overflow-hidden rounded-xl border border-[#E7E5E4] bg-white">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-left">
+            <table className="w-full min-w-175 text-left">
               <thead className="border-b border-[#E7E5E4] bg-[#F8F7F4]">
                 <tr>
                   <th className="px-5 py-4 text-xs font-medium uppercase tracking-wide text-[#737373]">
