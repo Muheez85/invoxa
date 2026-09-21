@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
-import Sidebar from "../components/layouts/Sidebar";
-import Navbar from "../components/layouts/Navbar";
+import Sidebar from "../../components/layouts/Sidebar";
+import Navbar from "../../components/layouts/Navbar";
 
 const DashboardLayouts = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
