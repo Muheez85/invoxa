@@ -114,12 +114,11 @@ useEffect(() => {
   };
 
   const handleDownloadPDF = () => {
-    generatePDF(
-      invoiceRef.current,
-      invoiceDetails.number
-    );
-  };
-
+  generatePDF(
+    invoice,
+    invoiceDetails.number
+  );
+};
   return (
     <div className="space-y-6">
       {successMessage && (

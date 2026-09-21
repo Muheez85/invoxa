@@ -1,30 +1,43 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import useInvoicesStore from "../../store/invoicesStore";
 
 const RecentInvoices = () => {
-  const invoices = [
-    {
-      id: "INV-001",
-      customer: "John Doe",
-      date: "Sep 5, 2026",
-      amount: "₦150,000",
-      status: "Paid",
-    },
-    {
-      id: "INV-002",
-      customer: "Sarah Ltd",
-      date: "Sep 4, 2026",
-      amount: "₦85,000",
-      status: "Pending",
-    },
-    {
-      id: "INV-003",
-      customer: "Mike Store",
-      date: "Sep 2, 2026",
-      amount: "₦220,000",
-      status: "Paid",
-    },
-  ];
+  const invoices = useInvoicesStore((state) => state.invoices);
+
+  const recentInvoices = [...invoices]
+    .sort((a, b) => Number(b.id) - Number(a.id))
+    .slice(0, 5);
+
+  const calculateTotal = (invoice) => {
+    const subtotal = invoice.items.reduce(
+      (total, item) => total + item.quantity * item.unitPrice,
+      0
+    );
+
+    const discount = Number(invoice.discount) || 0;
+    const tax = Number(invoice.tax) || 0;
+
+    return subtotal - discount + tax;
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatDate = (date) => {
+    if (!date) return "—";
+
+    return new Date(date).toLocaleDateString("en-NG", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   return (
     <section className="rounded-xl border border-[#E7E5E4] bg-white">
@@ -50,46 +63,70 @@ const RecentInvoices = () => {
       </div>
 
       {/* Invoice List */}
-      <div className="divide-y divide-[#E7E5E4]">
-        {invoices.map((invoice) => (
-          <div
-            key={invoice.id}
-            className="flex items-center justify-between gap-4 px-5 py-4"
+      {recentInvoices.length === 0 ? (
+        <div className="px-5 py-10 text-center">
+          <p className="text-sm font-medium text-[#171717]">
+            No invoices yet
+          </p>
+
+          <p className="mt-1 text-sm text-[#737373]">
+            Create your first invoice to see it here.
+          </p>
+
+          <Link
+            to="/invoices/new"
+            className="mt-4 inline-flex rounded-lg bg-[#171717] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#2D2D2D]"
           >
-            {/* Invoice + Customer */}
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-[#171717]">
-                {invoice.id}
-              </p>
+            Create Invoice
+          </Link>
+        </div>
+      ) : (
+        <div className="divide-y divide-[#E7E5E4]">
+          {recentInvoices.map((invoice) => {
+            const status = invoice.invoiceDetails.status;
 
-              <p className="mt-1 truncate text-sm text-[#737373]">
-                {invoice.customer}
-              </p>
-            </div>
+            return (
+              <Link
+                key={invoice.id}
+                to={`/invoices/${invoice.id}`}
+                className="flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-[#F8F7F4]"
+              >
+                {/* Invoice + Customer */}
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-[#171717]">
+                    {invoice.invoiceDetails.number || "Invoice"}
+                  </p>
 
-            {/* Date */}
-            <p className="hidden text-sm text-[#737373] sm:block">
-              {invoice.date}
-            </p>
+                  <p className="mt-1 truncate text-sm text-[#737373]">
+                    {invoice.customer.name || "No customer"}
+                  </p>
+                </div>
 
-            {/* Amount */}
-            <p className="text-sm font-medium text-[#171717]">
-              {invoice.amount}
-            </p>
+                {/* Date */}
+                <p className="hidden text-sm text-[#737373] sm:block">
+                  {formatDate(invoice.invoiceDetails.issueDate)}
+                </p>
 
-            {/* Status */}
-            <span
-              className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                invoice.status === "Paid"
-                  ? "bg-green-50 text-green-700"
-                  : "bg-yellow-50 text-yellow-700"
-              }`}
-            >
-              {invoice.status}
-            </span>
-          </div>
-        ))}
-      </div>
+                {/* Amount */}
+                <p className="text-sm font-medium text-[#171717]">
+                  {formatCurrency(calculateTotal(invoice))}
+                </p>
+
+                {/* Status */}
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                    status === "paid"
+                      ? "bg-green-50 text-green-700"
+                      : "bg-yellow-50 text-yellow-700"
+                  }`}
+                >
+                  {status === "paid" ? "Paid" : "Pending"}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 };
